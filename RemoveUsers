@@ -1,0 +1,64 @@
+// ==UserScript==
+// @name         Remove Users from Rotter
+// @namespace    https://rotter.net/forum/listforum.php
+// @version      0.1
+// @description  This script removes selected users from the Rotter.net scoop forum
+// @author       NiggurathShub
+// @match        https://rotter.net/forum/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // Function to remove elements with specific text content
+    function removeElementsWithText(text) {
+        const elements = document.querySelectorAll('td[align="center"] font[color="#000099"]');
+        elements.forEach(element => {
+            if (element.textContent.trim() === text) {
+                const row = element.closest('tr');
+                if (row) {
+                    row.remove();
+                }
+            }
+        });
+    }
+
+    // Function to remove a table based on its content
+    function removeTableWithContent(content) {
+        const tables = document.querySelectorAll('table');
+        tables.forEach(table => {
+            const td = table.querySelector('td > table td > font > a > b');
+            if (td && td.textContent.includes(content)) {
+                const parentTable = table.closest('table');
+                if (parentTable) {
+                    parentTable.remove();
+                }
+            }
+        });
+    }
+
+    // Combined function to remove elements based on different conditions
+    function combineScripts() {
+        const elementsToRemove = document.querySelectorAll('td[align="center"] font.text13r');
+        const targetContents = ['username']; //Enter usernames here, between the square brackets, the usernames must be comma separated and in single quote, example: 'username','username2'.
+
+        elementsToRemove.forEach(element => {
+            const textContent = element.textContent.trim();
+            if (textContent === "username") {
+                const tdElement = element.closest('td[align="center"]');
+                const trElement = tdElement.closest('tr');
+                trElement.remove();
+            }//Enter usernames here, the usernames must be separated with two pipes: '||' and in double quotes, example: textContent === "username" || textContent === "username2".
+        });
+
+        targetContents.forEach(target => {
+            removeTableWithContent(target);
+            removeElementsWithText(target);
+        });
+    }
+
+    // Call the combined function
+    combineScripts();
+
+})();
